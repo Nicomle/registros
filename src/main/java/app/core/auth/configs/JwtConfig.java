@@ -11,13 +11,12 @@ import org.springframework.context.annotation.Configuration;
 @NoArgsConstructor
 @Configuration
 @ConfigurationProperties(prefix = "configs.auth")
-public class AuthProperties {
+public class JwtConfig {
 
     private Security security;
     private String timeZone;
     private String issuer;
     private Token token;
-    private Exclude exclude;
 
     @Data
     public static class Security {
@@ -39,10 +38,5 @@ public class AuthProperties {
     @Data
     public static class Expiration {
         public int seconds;
-    }
-
-    @Data
-    public static class Exclude {
-        public String paths;
     }
 }

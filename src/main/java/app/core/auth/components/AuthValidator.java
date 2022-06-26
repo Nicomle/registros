@@ -6,12 +6,8 @@ import app.core.auth.request.AuthRequest;
 import app.feature.entities.Usuario;
 import app.feature.repositories.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import org.springframework.util.MultiValueMap;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 

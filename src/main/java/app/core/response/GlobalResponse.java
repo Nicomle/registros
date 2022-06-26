@@ -1,14 +1,13 @@
 package app.core.response;
 
 import app.core.exceptions.ErrorDetails;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.http.HttpStatus;
 
 import java.util.Date;
 
-@Data
+@Setter
+@Getter
 @AllArgsConstructor
 @NoArgsConstructor
 public class GlobalResponse {

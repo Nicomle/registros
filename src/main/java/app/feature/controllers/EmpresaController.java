@@ -8,6 +8,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,6 +25,7 @@ public class EmpresaController {
     private EmpresaService empresaServices;
 
     @GetMapping("/obtener")
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<GlobalResponse> obtenerEmpresa(@RequestParam String cuit, HttpServletRequest request) {
         if(cuit == null || cuit.equals("") || !StringUtils.isNumeric(cuit)) {
             ErrorDetails errorDetails = new ErrorDetails("Error en el ingreso de datos.", "Cuit invalido. Debe ser un numero no vacio ni nulo.");
@@ -34,11 +36,13 @@ public class EmpresaController {
     }
 
     @GetMapping("/obtener/lista")
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<GlobalResponse> obtenerListaEmpresas(HttpServletRequest request) {
         return empresaServices.obtenerListaEmpresas(request);
     }
 
     @PostMapping("/guardar")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<GlobalResponse> guardarEmpresa(@Valid @RequestBody Empresa empresa, BindingResult bindingResult, HttpServletRequest request) {
         if(bindingResult.hasErrors()) {
             List<String> errors = new ArrayList<>();
@@ -53,6 +57,7 @@ public class EmpresaController {
     }
 
     @DeleteMapping("/eliminar")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<GlobalResponse> eliminarEmpresa(@RequestParam String cuit, HttpServletRequest request) {
         if(cuit == null || cuit.equals("") || !StringUtils.isNumeric(cuit)) {
             ErrorDetails errorDetails = new ErrorDetails("Error en el ingreso de datos.", "Cuit invalido. Debe ser un numero no vacio ni nulo.");
@@ -63,6 +68,7 @@ public class EmpresaController {
     }
 
     @PutMapping("/editar")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<GlobalResponse> editarEmpresa(@RequestParam String id, @Valid @RequestBody Empresa empresa, BindingResult bindingResult, HttpServletRequest request) {
         if (id == null || id.equals("") || !StringUtils.isNumeric(id)) {
             ErrorDetails errorDetails = new ErrorDetails("Error en el ingreso de datos.", "ID invalido. Debe ser un numero no vacio ni nulo.");

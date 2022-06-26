@@ -2,19 +2,21 @@ package app.core.auth.services;
 
 import app.core.auth.dtos.AuthUserLoggedIn;
 import app.core.utils.GsonUtil;
-import io.fusionauth.jwt.Signer;
-import io.fusionauth.jwt.Verifier;
-import io.fusionauth.jwt.domain.JWT;
-import io.fusionauth.jwt.hmac.HMACSigner;
-import io.fusionauth.jwt.hmac.HMACVerifier;
+import com.google.gson.Gson;
+import io.jsonwebtoken.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.time.ZonedDateTime;
+import java.util.Date;
 import java.util.TimeZone;
 
 @Service
 public class AuthJwt {
+
+    private final static Logger logger = LoggerFactory.getLogger(AuthJwt.class);
 
     @Value("${configs.auth.token.secret:secretPassDefault}")
     private String SECRET;
@@ -30,37 +32,40 @@ public class AuthJwt {
 
     public String generateToken(Object obj) {
         String subject = GsonUtil.serialize(obj);
-        Signer signer = HMACSigner.newSHA256Signer(SECRET);
-
         TimeZone tz = TimeZone.getTimeZone(TIMEZONE);
         ZonedDateTime now = ZonedDateTime.now(tz.toZoneId());
         ZonedDateTime exp = now.plusSeconds(EXPIRATION_TIME);
 
-        JWT jwt = new JWT()
+        return Jwts.builder()
                 .setIssuer(ISSUER)
                 .setSubject(subject)
-                .setIssuedAt(now)
-                .setExpiration(exp);
-        return JWT.getEncoder().encode(jwt, signer);
+                .setIssuedAt(new Date())
+                .setExpiration(Date.from(exp.toInstant()))
+                .signWith(SignatureAlgorithm.HS512, SECRET)
+                .compact();
     }
 
     public boolean validateToken(String token) {
-        JWT jwt = jwt(token);
-        return !jwt.isExpired();
+        try {
+            Jwts.parser().setSigningKey(SECRET).parseClaimsJws(token);
+            return true;
+        } catch (MalformedJwtException e) {
+            logger.error("token mal formado");
+        } catch (UnsupportedJwtException e) {
+            logger.error("token no soportado");
+        } catch (ExpiredJwtException e) {
+            logger.error("token expirado");
+        } catch (IllegalArgumentException e) {
+            logger.error("token vacío");
+        } catch (SignatureException e) {
+            logger.error("fail en la firma");
+        }
+        return false;
     }
 
-    public String getPayLoad(String token) {
-        JWT jwt = jwt(token);
-        return jwt.subject;
-    }
-
-    public AuthUserLoggedIn getPayLoadObject(String token) {
-        String payload = getPayLoad(token);
-        return GsonUtil.toObject(payload, AuthUserLoggedIn.class);
-    }
-
-    private JWT jwt(String token) {
-        Verifier verifier = HMACVerifier.newVerifier(SECRET);
-        return JWT.getDecoder().decode(token, verifier);
+    public String getNombreUsuarioFromToken(String token) {
+        Gson gson = new Gson();
+        AuthUserLoggedIn usuario = gson.fromJson(Jwts.parser().setSigningKey(SECRET).parseClaimsJws(token).getBody().getSubject(), AuthUserLoggedIn.class);
+        return usuario.getUserName();
     }
 }

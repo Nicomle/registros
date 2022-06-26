@@ -20,10 +20,6 @@ public class DateUtil {
         return sdf;
     }
 
-    public String getDateString() {
-        return simpleDateFormat().format(new Date());
-    }
-
     public long getDateMillis() {
         String strDate = simpleDateFormat().format(new Date());
         Date strNow = new Date();

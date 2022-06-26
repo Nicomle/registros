@@ -8,6 +8,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,6 +25,7 @@ public class ProyectoController {
     ProyectoService proyectoService;
 
     @GetMapping("/obtener")
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<GlobalResponse> obtenerProyecto(@RequestParam String id, HttpServletRequest request) {
         if(id == null || id.equals("") || !StringUtils.isNumeric(id)) {
             ErrorDetails errorDetails = new ErrorDetails("Error en el ingreso de datos.", "ID invalido. Debe ser un numero no vacio ni nulo.");
@@ -34,11 +36,13 @@ public class ProyectoController {
     }
 
     @GetMapping("/obtener/lista")
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<GlobalResponse> obtenerListaProyectos(HttpServletRequest request) {
         return proyectoService.obtenerListaProyectos(request);
     }
 
     @PostMapping("/guardar")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<GlobalResponse> guardarProyecto(@Valid @RequestBody Proyecto proyecto, BindingResult bindingResult, HttpServletRequest request) {
         if(bindingResult.hasErrors()) {
             List<String> errors = new ArrayList<>();
@@ -53,6 +57,7 @@ public class ProyectoController {
     }
 
     @DeleteMapping("/eliminar")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<GlobalResponse> eliminarProyecto(@RequestParam String id, HttpServletRequest request) {
         if(id == null || id.equals("") || !StringUtils.isNumeric(id)) {
             ErrorDetails errorDetails = new ErrorDetails("Error en el ingreso de datos.", "ID invalido. Debe ser un numero no vacio ni nulo.");
@@ -63,6 +68,7 @@ public class ProyectoController {
     }
 
     @PutMapping("/editar")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<GlobalResponse> editarProyecto(@RequestParam String id, @Valid @RequestBody Proyecto proyecto, BindingResult bindingResult, HttpServletRequest request) {
         if (id == null || id.equals("") || !StringUtils.isNumeric(id)) {
             ErrorDetails errorDetails = new ErrorDetails("Error en el ingreso de datos.", "ID invalido. Debe ser un numero no vacio ni nulo.");
