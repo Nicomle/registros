@@ -1,4 +1,4 @@
-package app.core.auth.interceptor;
+package app.core.auth.components;
 
 import app.core.auth.services.AuthJwt;
 import org.springframework.beans.factory.annotation.Autowired;

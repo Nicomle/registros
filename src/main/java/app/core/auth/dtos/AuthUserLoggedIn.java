@@ -1,21 +1,22 @@
 package app.core.auth.dtos;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import app.core.auth.entities.AuthRoles;
+import lombok.*;
 
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 public class AuthUserLoggedIn {
 
+    private String userName;
     private String name;
     private String surName;
     private Long dni;
     private String email;
-    private List<String> roles;
+    private Set<AuthRoles> roles = new HashSet<>();
 }

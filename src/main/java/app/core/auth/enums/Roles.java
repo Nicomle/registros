@@ -1,6 +1,6 @@
 package app.core.auth.enums;
 
 public enum Roles {
-    USER,
-    ADMINISTRADOR
+    ROLE_USER,
+    ROLE_ADMIN
 }

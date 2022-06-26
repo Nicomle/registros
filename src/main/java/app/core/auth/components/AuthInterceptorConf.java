@@ -1,4 +1,4 @@
-package app.core.auth.interceptor;
+package app.core.auth.components;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Component
-public class AuthInterceptorConfigurer implements WebMvcConfigurer {
+public class AuthInterceptorConf implements WebMvcConfigurer {
 
     @Value("${configs.auth.security.enabled}")
     private boolean securityEnabled;

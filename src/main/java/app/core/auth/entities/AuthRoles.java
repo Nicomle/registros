@@ -1,13 +1,13 @@
 package app.core.auth.entities;
 
-import app.feature.entities.Usuario;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import app.core.auth.enums.Roles;
+import lombok.*;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
@@ -19,9 +19,7 @@ public class AuthRoles {
     @Column(name = "id", nullable = false)
     private Long id;
 
-    private String rol;
-
-    @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "usuario_id")
-    private Usuario usuario;
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    private Roles rol;
 }

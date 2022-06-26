@@ -22,17 +22,13 @@ public class AuthService {
     public AuthResponse login(AuthUserLoggedIn user) {
 
         AuthResponse response = AuthResponse.builder()
+                .userName(user.getUserName())
                 .tokenType("Bearer")
                 .accessToken(authJwt.generateToken(user))
-                .refreshToken("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c")
-                .issuedAt(dateUtil.getDateMillis() + "")
-                .clientId(user.getDni())
+                .issuedAt(String.valueOf(dateUtil.getDateMillis()))
                 .expiresIn(EXPIRATION_TIME)
+                .roles(user.getRoles())
                 .build();
         return response;
-    }
-
-    public AuthUserLoggedIn getPayloadObject(String token) {
-        return authJwt.getPayLoadObject(token);
     }
 }

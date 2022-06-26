@@ -9,7 +9,9 @@ import lombok.Setter;
 import javax.persistence.*;
 import javax.validation.constraints.*;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -34,6 +36,10 @@ public class Usuario {
     @NotNull(message = "El DNI no puede ser nulo.")
     private Long dni;
 
+    @NotNull
+    @Column(unique = true)
+    private String userName;
+
     @Email(message = "Email no valido.")
     @NotBlank(message = "El EMAIL no puede ser nulo o vacio.")
     private String email;
@@ -42,6 +48,9 @@ public class Usuario {
     @Size(min = 5, max = 15, message = "La contraseña debe contener una longitud de 5 a 15 caracteres.")
     private String password;
 
-    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<AuthRoles> roles = new ArrayList<>();
+    @NotNull
+    @ManyToMany(cascade = CascadeType.ALL)
+    @JoinTable(name = "usuario_rol", joinColumns = @JoinColumn(name = "usuario_id"),
+            inverseJoinColumns = @JoinColumn(name = "auth_roles_id"))
+    private Set<AuthRoles> roles = new HashSet<>();
 }

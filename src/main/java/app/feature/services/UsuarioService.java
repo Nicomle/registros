@@ -13,7 +13,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class UsuarioService {
@@ -52,10 +54,15 @@ public class UsuarioService {
 
     public ResponseEntity<GlobalResponse> guardarUsuario(Usuario usuario, HttpServletRequest request) {
         try {
-            AuthRoles auth = new AuthRoles();
-            auth.setRol(Roles.USER.toString());
-            auth.setUsuario(usuario);
-            authRolesRepository.save(auth);
+            Optional<AuthRoles> auth = authRolesRepository.findByRol(Roles.ROLE_USER);
+            if (!auth.isPresent()) {
+                ErrorDetails errorDetails = new ErrorDetails("Error al intentar guardar registro en la base de datos.", "El ROL que se quiere acceder no existe.");
+                return new ResponseEntity<>(GlobalResponse.globalResponse(HttpStatus.INTERNAL_SERVER_ERROR, request.getRequestURI(),
+                        null, errorDetails), HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+            Set<AuthRoles> roles = new HashSet<>();
+            roles.add(auth.get());
+            usuario.setRoles(roles);
             return new ResponseEntity<>(GlobalResponse.globalResponse(HttpStatus.OK, request.getRequestURI(),
                     usuarioRepository.save(usuario), null), HttpStatus.OK);
         } catch (Exception e) {
