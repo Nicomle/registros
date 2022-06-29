@@ -9,6 +9,7 @@ import app.core.auth.components.AuthValidator;
 import app.core.exceptions.ErrorDetails;
 import app.core.response.GlobalResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -30,21 +31,33 @@ public class AuthController {
     @Autowired
     private AuthValidator authValidator;
 
+    @Value("${CLIENT_CREDENTIALS}")
+    private String CLIENT_CREDENTIALS;
+
     @PostMapping(path = "/login")
     public ResponseEntity<GlobalResponse> login(@Valid @RequestBody AuthRequest authRequest, BindingResult bindingResult,
-                                @RequestParam("grant_type") String grantType, HttpServletRequest request) throws AuthException {
-        if(bindingResult.hasErrors()) {
-            List<String> errors = new ArrayList<>();
+                                                @RequestParam("grant_type") String grantType, HttpServletRequest request) {
+        List<String> errors = new ArrayList<>();
+        if (grantType.isEmpty() || !grantType.equals(CLIENT_CREDENTIALS)) {
+            errors.add("Grant Type invalido");
+        }
+        if (bindingResult.hasErrors()) {
             bindingResult.getAllErrors().forEach(error -> {
                 errors.add(error.getDefaultMessage());
             });
-            ErrorDetails errorDetails = new ErrorDetails("Error en el ingreso de datos.", String.join(", ", errors));
+            ErrorDetails errorDetails = new ErrorDetails("Error en el ingreso de datos", String.join(". ", errors));
             return new ResponseEntity<>(GlobalResponse.globalResponse(HttpStatus.BAD_REQUEST, request.getRequestURI(),
                     null, errorDetails), HttpStatus.BAD_REQUEST);
         }
-        AuthUserLoggedIn user = authValidator.validate(authRequest, grantType);
-        AuthResponse token = authService.login(user);
-        return new ResponseEntity<>(GlobalResponse.globalResponse(HttpStatus.OK, request.getRequestURI(),
-                token, null), HttpStatus.OK);
+        try {
+            AuthUserLoggedIn user = authValidator.validarBuscarUsuario(authRequest);
+            AuthResponse token = authService.login(user);
+            return new ResponseEntity<>(GlobalResponse.globalResponse(HttpStatus.OK, request.getRequestURI(),
+                    token, null), HttpStatus.OK);
+        } catch (AuthException e) {
+            ErrorDetails errorDetails = new ErrorDetails("Error al acceder usuario", e.getMessage());
+            return new ResponseEntity<>(GlobalResponse.globalResponse(HttpStatus.BAD_REQUEST, request.getRequestURI(),
+                    null, errorDetails), HttpStatus.BAD_REQUEST);
+        }
     }
 }

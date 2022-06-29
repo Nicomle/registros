@@ -23,10 +23,10 @@ public class Proyecto {
 
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "empresa_id")
-    @NotNull(message = "La empresa no puede ser nulo.")
+    @NotNull(message = "La empresa no puede ser nulo")
     private Empresa company;
 
-    @NotBlank(message = "La descripcion no puede ser nulo o vacio.")
+    @NotBlank(message = "La descripcion no puede ser nulo o vacio")
     private String name;
 
     private boolean status = true;

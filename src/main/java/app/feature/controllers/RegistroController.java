@@ -27,7 +27,7 @@ public class RegistroController {
     @GetMapping("/obtener")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<GlobalResponse> obtenerRegistro(@RequestParam String id, HttpServletRequest request) {
-        if(id == null || id.equals("") || !StringUtils.isNumeric(id)) {
+        if (id == null || id.equals("") || !StringUtils.isNumeric(id)) {
             ErrorDetails errorDetails = new ErrorDetails("Error en el ingreso de datos.", "ID invalido. Debe ser un numero no vacio ni nulo.");
             return new ResponseEntity<>(GlobalResponse.globalResponse(HttpStatus.BAD_REQUEST, request.getRequestURI(),
                     null, errorDetails), HttpStatus.BAD_REQUEST);
@@ -44,7 +44,7 @@ public class RegistroController {
     @PostMapping("/guardar")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<GlobalResponse> guardarRegistro(@Valid @RequestBody Registro registro, BindingResult bindingResult, HttpServletRequest request) {
-        if(bindingResult.hasErrors()) {
+        if (bindingResult.hasErrors()) {
             List<String> errors = new ArrayList<>();
             bindingResult.getAllErrors().forEach(error -> {
                 errors.add(error.getDefaultMessage());
@@ -59,7 +59,7 @@ public class RegistroController {
     @DeleteMapping("/eliminar")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<GlobalResponse> eliminarRegistro(@RequestParam String id, HttpServletRequest request) {
-        if(id == null || id.equals("") || !StringUtils.isNumeric(id)) {
+        if (id == null || id.equals("") || !StringUtils.isNumeric(id)) {
             ErrorDetails errorDetails = new ErrorDetails("Error en el ingreso de datos.", "ID invalido. Debe ser un numero no vacio ni nulo.");
             return new ResponseEntity<>(GlobalResponse.globalResponse(HttpStatus.BAD_REQUEST, request.getRequestURI(),
                     null, errorDetails), HttpStatus.BAD_REQUEST);
@@ -75,7 +75,7 @@ public class RegistroController {
             return new ResponseEntity<>(GlobalResponse.globalResponse(HttpStatus.BAD_REQUEST, request.getRequestURI(),
                     null, errorDetails), HttpStatus.BAD_REQUEST);
         }
-        if(bindingResult.hasErrors()) {
+        if (bindingResult.hasErrors()) {
             List<String> errors = new ArrayList<>();
             bindingResult.getAllErrors().forEach(error -> {
                 errors.add(error.getDefaultMessage());

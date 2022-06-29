@@ -26,9 +26,9 @@ public class UsuarioService {
     @Autowired
     private AuthRolesRepository authRolesRepository;
 
-    public ResponseEntity<GlobalResponse> obtenerUsuario(String dni, HttpServletRequest request) {
+    public ResponseEntity<GlobalResponse> obtenerUsuario(String userName, HttpServletRequest request) {
         try {
-            Optional<Usuario> usuarioBase = usuarioRepository.findByDni(Long.parseLong(dni));
+            Optional<Usuario> usuarioBase = usuarioRepository.findByUserName(userName);
             if (!usuarioBase.isPresent()) {
                 return new ResponseEntity<>(null, HttpStatus.NO_CONTENT);
             }
@@ -54,6 +54,12 @@ public class UsuarioService {
 
     public ResponseEntity<GlobalResponse> guardarUsuario(Usuario usuario, HttpServletRequest request) {
         try {
+            Optional<Usuario> usuarioBase = usuarioRepository.findByUserName(usuario.getUserName());
+            if (usuarioBase.isPresent()) {
+                ErrorDetails errorDetails = new ErrorDetails("Error al intentar guardar registro en la base de datos.", "El usuario " + usuario.getUserName() + " ya existe.");
+                return new ResponseEntity<>(GlobalResponse.globalResponse(HttpStatus.BAD_REQUEST, request.getRequestURI(),
+                        usuario, errorDetails), HttpStatus.BAD_REQUEST);
+            }
             Optional<AuthRoles> auth = authRolesRepository.findByRol(Roles.ROLE_USER);
             if (!auth.isPresent()) {
                 ErrorDetails errorDetails = new ErrorDetails("Error al intentar guardar registro en la base de datos.", "El ROL que se quiere acceder no existe.");
@@ -72,9 +78,9 @@ public class UsuarioService {
         }
     }
 
-    public ResponseEntity<GlobalResponse> eliminarUsuario(String dni, HttpServletRequest request) {
+    public ResponseEntity<GlobalResponse> eliminarUsuario(String userName, HttpServletRequest request) {
         try {
-            Optional<Usuario> usuarioBase = usuarioRepository.findByDni(Long.parseLong(dni));
+            Optional<Usuario> usuarioBase = usuarioRepository.findByUserName(userName);
             if (!usuarioBase.isPresent()) {
                 return new ResponseEntity<>(null, HttpStatus.NO_CONTENT);
             }
@@ -88,9 +94,9 @@ public class UsuarioService {
         }
     }
 
-    public ResponseEntity<GlobalResponse> editarUsuario(String dni, Usuario usuario, HttpServletRequest request) {
+    public ResponseEntity<GlobalResponse> editarUsuario(String userName, Usuario usuario, HttpServletRequest request) {
         try {
-            Optional<Usuario> usuarioBase = usuarioRepository.findByDni(Long.parseLong(dni));
+            Optional<Usuario> usuarioBase = usuarioRepository.findByUserName(userName);
             if (!usuarioBase.isPresent()) {
                 return new ResponseEntity<>(null, HttpStatus.NO_CONTENT);
             }
@@ -108,7 +114,7 @@ public class UsuarioService {
         }
     }
 
-    public Usuario obtenerUsuarioId(Long id) throws Exception {
+    public Usuario obtenerUsuarioId(Long id) {
         Optional<Usuario> usuario = usuarioRepository.findById(id);
         if (usuario.isPresent()) {
             return usuario.get();

@@ -27,7 +27,7 @@ public class ProyectoController {
     @GetMapping("/obtener")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<GlobalResponse> obtenerProyecto(@RequestParam String id, HttpServletRequest request) {
-        if(id == null || id.equals("") || !StringUtils.isNumeric(id)) {
+        if (id == null || id.equals("") || !StringUtils.isNumeric(id)) {
             ErrorDetails errorDetails = new ErrorDetails("Error en el ingreso de datos.", "ID invalido. Debe ser un numero no vacio ni nulo.");
             return new ResponseEntity<>(GlobalResponse.globalResponse(HttpStatus.BAD_REQUEST, request.getRequestURI(),
                     null, errorDetails), HttpStatus.BAD_REQUEST);
@@ -44,12 +44,12 @@ public class ProyectoController {
     @PostMapping("/guardar")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<GlobalResponse> guardarProyecto(@Valid @RequestBody Proyecto proyecto, BindingResult bindingResult, HttpServletRequest request) {
-        if(bindingResult.hasErrors()) {
+        if (bindingResult.hasErrors()) {
             List<String> errors = new ArrayList<>();
             bindingResult.getAllErrors().forEach(error -> {
                 errors.add(error.getDefaultMessage());
             });
-            ErrorDetails errorDetails = new ErrorDetails("Error en el ingreso de datos.", String.join(", ", errors));
+            ErrorDetails errorDetails = new ErrorDetails("Error en el ingreso de datos.", String.join(". ", errors));
             return new ResponseEntity<>(GlobalResponse.globalResponse(HttpStatus.BAD_REQUEST, request.getRequestURI(),
                     null, errorDetails), HttpStatus.BAD_REQUEST);
         }
@@ -59,7 +59,7 @@ public class ProyectoController {
     @DeleteMapping("/eliminar")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<GlobalResponse> eliminarProyecto(@RequestParam String id, HttpServletRequest request) {
-        if(id == null || id.equals("") || !StringUtils.isNumeric(id)) {
+        if (id == null || id.equals("") || !StringUtils.isNumeric(id)) {
             ErrorDetails errorDetails = new ErrorDetails("Error en el ingreso de datos.", "ID invalido. Debe ser un numero no vacio ni nulo.");
             return new ResponseEntity<>(GlobalResponse.globalResponse(HttpStatus.BAD_REQUEST, request.getRequestURI(),
                     null, errorDetails), HttpStatus.BAD_REQUEST);
@@ -75,12 +75,12 @@ public class ProyectoController {
             return new ResponseEntity<>(GlobalResponse.globalResponse(HttpStatus.BAD_REQUEST, request.getRequestURI(),
                     null, errorDetails), HttpStatus.BAD_REQUEST);
         }
-        if(bindingResult.hasErrors()) {
+        if (bindingResult.hasErrors()) {
             List<String> errors = new ArrayList<>();
             bindingResult.getAllErrors().forEach(error -> {
                 errors.add(error.getDefaultMessage());
             });
-            ErrorDetails errorDetails = new ErrorDetails("Error en el ingreso de datos.", String.join(", ", errors));
+            ErrorDetails errorDetails = new ErrorDetails("Error en el ingreso de datos.", String.join(". ", errors));
             return new ResponseEntity<>(GlobalResponse.globalResponse(HttpStatus.BAD_REQUEST, request.getRequestURI(),
                     null, errorDetails), HttpStatus.BAD_REQUEST);
         }

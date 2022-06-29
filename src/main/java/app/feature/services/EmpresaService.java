@@ -46,6 +46,12 @@ public class EmpresaService {
 
     public ResponseEntity<GlobalResponse> guardarEmpresa(Empresa empresa, HttpServletRequest request) {
         try {
+            Optional<Empresa> empresaBase = empresaRepository.findByCuit(empresa.getCuit());
+            if (empresaBase.isPresent()) {
+                ErrorDetails errorDetails = new ErrorDetails("Error al intentar guardar registro en la base de datos.", "La empresa con cuit " + empresa.getCuit() + " ya existe.");
+                return new ResponseEntity<>(GlobalResponse.globalResponse(HttpStatus.BAD_REQUEST, request.getRequestURI(),
+                        empresa, errorDetails), HttpStatus.BAD_REQUEST);
+            }
             return new ResponseEntity<>(GlobalResponse.globalResponse(HttpStatus.OK, request.getRequestURI(),
                     empresaRepository.save(empresa), null), HttpStatus.OK);
         } catch (Exception e) {
@@ -61,6 +67,7 @@ public class EmpresaService {
             if (!empresaBase.isPresent()) {
                 return new ResponseEntity<>(null, HttpStatus.NO_CONTENT);
             }
+            empresaRepository.delete(empresaBase.get());
             return new ResponseEntity<>(GlobalResponse.globalResponse(HttpStatus.OK, request.getRequestURI(),
                     empresaBase.get(), null), HttpStatus.OK);
         } catch (Exception e) {
@@ -76,8 +83,10 @@ public class EmpresaService {
             if (!empresaBase.isPresent()) {
                 return new ResponseEntity<>(null, HttpStatus.NO_CONTENT);
             }
+            empresaBase.get().setCuit(empresa.getCuit());
+            empresaBase.get().setName(empresa.getName());
             return new ResponseEntity<>(GlobalResponse.globalResponse(HttpStatus.OK, request.getRequestURI(),
-                    empresaRepository.save(empresa), null), HttpStatus.OK);
+                    empresaRepository.save(empresaBase.get()), null), HttpStatus.OK);
         } catch (Exception e) {
             ErrorDetails errorDetails = new ErrorDetails("Error al intentar editar registro en la base de datos.", e.getMessage());
             return new ResponseEntity<>(GlobalResponse.globalResponse(HttpStatus.INTERNAL_SERVER_ERROR, request.getRequestURI(),
@@ -85,9 +94,9 @@ public class EmpresaService {
         }
     }
 
-    public Empresa obtenerEmpresaId(Long id) throws Exception {
+    public Empresa obtenerEmpresaId(Long id) {
         Optional<Empresa> empresa = empresaRepository.findById(id);
-        if(empresa.isPresent()) {
+        if (empresa.isPresent()) {
             return empresa.get();
         } else {
             return null;

@@ -25,12 +25,12 @@ public class ProyectoService {
     public ResponseEntity<GlobalResponse> obtenerProyecto(Long id, HttpServletRequest request) {
         try {
             Optional<Proyecto> proyectoBase = proyectoRepository.findById(id);
-            if(!proyectoBase.isPresent()) {
+            if (!proyectoBase.isPresent()) {
                 return new ResponseEntity<>(null, HttpStatus.NO_CONTENT);
             }
             return new ResponseEntity<>(GlobalResponse.globalResponse(HttpStatus.OK, request.getRequestURI(),
                     proyectoBase.get(), null), HttpStatus.OK);
-        } catch(Exception e) {
+        } catch (Exception e) {
             ErrorDetails errorDetails = new ErrorDetails("Error al intentar obtener registro en la base de datos.", e.getMessage());
             return new ResponseEntity<>(GlobalResponse.globalResponse(HttpStatus.INTERNAL_SERVER_ERROR, request.getRequestURI(),
                     null, errorDetails), HttpStatus.INTERNAL_SERVER_ERROR);
@@ -49,14 +49,14 @@ public class ProyectoService {
     }
 
     public ResponseEntity<GlobalResponse> guardarProyecto(Proyecto proyecto, HttpServletRequest request) {
-        if(proyecto.getCompany().getId() == null || proyecto.getCompany().getId() <= 0) {
+        if (proyecto.getCompany().getId() == null || proyecto.getCompany().getId() <= 0) {
             ErrorDetails errorDetails = new ErrorDetails("El ID de la empresa ingresada es invalida.", "ID Empresa: " + proyecto.getCompany().getId());
             return new ResponseEntity<>(GlobalResponse.globalResponse(HttpStatus.BAD_REQUEST, request.getRequestURI(),
                     null, errorDetails), HttpStatus.BAD_REQUEST);
         }
         try {
             Empresa empresa = empresaService.obtenerEmpresaId(proyecto.getCompany().getId());
-            if(empresa == null) {
+            if (empresa == null) {
                 ErrorDetails errorDetails = new ErrorDetails("El ID de la empresa ingresada no existe.", "ID Empresa: " + proyecto.getCompany().getId());
                 return new ResponseEntity<>(GlobalResponse.globalResponse(HttpStatus.BAD_REQUEST, request.getRequestURI(),
                         null, errorDetails), HttpStatus.BAD_REQUEST);
@@ -80,7 +80,7 @@ public class ProyectoService {
             }
             proyectoRepository.delete(proyectoBase.get());
             return new ResponseEntity<>(GlobalResponse.globalResponse(HttpStatus.OK, request.getRequestURI(),
-                    proyectoBase, null), HttpStatus.OK);
+                    proyectoBase.get(), null), HttpStatus.OK);
         } catch (Exception e) {
             ErrorDetails errorDetails = new ErrorDetails("Error al intentar eliminar registro en la base de datos.", e.getMessage());
             return new ResponseEntity<>(GlobalResponse.globalResponse(HttpStatus.BAD_REQUEST, request.getRequestURI(),
@@ -94,14 +94,14 @@ public class ProyectoService {
             if (!proyectoBase.isPresent()) {
                 return new ResponseEntity<>(null, HttpStatus.NO_CONTENT);
             }
-            if(proyecto.getCompany().getId() == null || proyecto.getCompany().getId() <= 0) {
+            if (proyecto.getCompany().getId() == null || proyecto.getCompany().getId() <= 0) {
                 ErrorDetails errorDetails = new ErrorDetails("El ID de la empresa ingresada es invalida.", "ID Empresa: " + proyecto.getCompany().getId());
                 return new ResponseEntity<>(GlobalResponse.globalResponse(HttpStatus.BAD_REQUEST, request.getRequestURI(),
                         null, errorDetails), HttpStatus.BAD_REQUEST);
             }
-            if(proyectoBase.get().getCompany().getId() != proyecto.getCompany().getId()){
+            if (proyectoBase.get().getCompany().getId() != proyecto.getCompany().getId()) {
                 Empresa empresa = empresaService.obtenerEmpresaId(proyecto.getCompany().getId());
-                if(empresa == null) {
+                if (empresa == null) {
                     ErrorDetails errorDetails = new ErrorDetails("El ID de la empresa ingresada no existe.", "ID Empresa: " + proyecto.getCompany().getId());
                     return new ResponseEntity<>(GlobalResponse.globalResponse(HttpStatus.BAD_REQUEST, request.getRequestURI(),
                             null, errorDetails), HttpStatus.BAD_REQUEST);
@@ -119,9 +119,9 @@ public class ProyectoService {
         }
     }
 
-    public Proyecto obtenerProyectoId(Long id) throws Exception {
+    public Proyecto obtenerProyectoId(Long id) {
         Optional<Proyecto> proyecto = proyectoRepository.findById(id);
-        if(proyecto.isPresent()) {
+        if (proyecto.isPresent()) {
             return proyecto.get();
         } else {
             return null;

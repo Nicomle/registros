@@ -20,9 +20,9 @@ public class Empresa {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank(message = "El cuit no puede ser nulo o vacio.")
+    @NotBlank(message = "El cuit no puede ser nulo o vacio")
     private String cuit;
 
-    @NotBlank(message = "El nombre no puede ser nulo o vacio.")
+    @NotBlank(message = "El nombre no puede ser nulo o vacio")
     private String name;
 }

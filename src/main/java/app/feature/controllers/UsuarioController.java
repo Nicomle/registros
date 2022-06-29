@@ -4,7 +4,6 @@ import app.feature.entities.Usuario;
 import app.feature.services.UsuarioService;
 import app.core.exceptions.ErrorDetails;
 import app.core.response.GlobalResponse;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,13 +25,13 @@ public class UsuarioController {
 
     @GetMapping("/obtener")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<GlobalResponse> obtenerUsuario(@RequestParam String dni, HttpServletRequest request) {
-        if(dni == null || dni.equals("") || !StringUtils.isNumeric(dni) || Long.parseLong(dni) < 1000000 || Long.parseLong(dni) > 999999999) {
-            ErrorDetails errorDetails = new ErrorDetails("Error en el ingreso de datos.", "Rango invalido: " + "DNI invalido. Debe ser un numero entre 1.000.000 y 999.999.999 no vacio ni nulo.");
+    public ResponseEntity<GlobalResponse> obtenerUsuario(@RequestParam String userName, HttpServletRequest request) {
+        if (userName == null || userName.equals("")) {
+            ErrorDetails errorDetails = new ErrorDetails("Error en el ingreso de datos.", "El nombre usuario no puede ser vacio ni nulo.");
             return new ResponseEntity<>(GlobalResponse.globalResponse(HttpStatus.BAD_REQUEST, request.getRequestURI(),
                     null, errorDetails), HttpStatus.BAD_REQUEST);
         }
-        return usuarioService.obtenerUsuario(dni, request);
+        return usuarioService.obtenerUsuario(userName, request);
     }
 
     @GetMapping("/obtener/lista")
@@ -43,12 +42,12 @@ public class UsuarioController {
 
     @PostMapping("/guardar")
     public ResponseEntity<GlobalResponse> guardarUsuario(@Valid @RequestBody Usuario usuario, BindingResult bindingResult, HttpServletRequest request) {
-        if(bindingResult.hasErrors()) {
+        if (bindingResult.hasErrors()) {
             List<String> errors = new ArrayList<>();
             bindingResult.getAllErrors().forEach(error -> {
                 errors.add(error.getDefaultMessage());
             });
-            ErrorDetails errorDetails = new ErrorDetails("Error en el ingreso de datos.", String.join(", ", errors));
+            ErrorDetails errorDetails = new ErrorDetails("Error en el ingreso de datos.", String.join(". ", errors));
             return new ResponseEntity<>(GlobalResponse.globalResponse(HttpStatus.BAD_REQUEST, request.getRequestURI(),
                     null, errorDetails), HttpStatus.BAD_REQUEST);
         }
@@ -57,32 +56,32 @@ public class UsuarioController {
 
     @DeleteMapping("/eliminar")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<GlobalResponse> eliminarUsuario(@RequestParam String dni, HttpServletRequest request) {
-        if(dni == null || dni.equals("") || !StringUtils.isNumeric(dni) || Long.parseLong(dni) < 1000000 || Long.parseLong(dni) > 999999999) {
-            ErrorDetails errorDetails = new ErrorDetails("Error en el ingreso de datos.", "DNI invalido. Debe ser un numero entre 1.000.000 y 999.999.999 no vacio ni nulo.");
+    public ResponseEntity<GlobalResponse> eliminarUsuario(@RequestParam String userName, HttpServletRequest request) {
+        if (userName == null || userName.equals("")) {
+            ErrorDetails errorDetails = new ErrorDetails("Error en el ingreso de datos.", "El nombre usuario no puede ser nulo ni vacio.");
             return new ResponseEntity<>(GlobalResponse.globalResponse(HttpStatus.BAD_REQUEST, request.getRequestURI(),
                     null, errorDetails), HttpStatus.BAD_REQUEST);
         }
-        return usuarioService.eliminarUsuario(dni, request);
+        return usuarioService.eliminarUsuario(userName, request);
     }
 
     @PutMapping("/editar")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<GlobalResponse> editarUsuario(@RequestParam String dni, @Valid @RequestBody Usuario usuario, BindingResult bindingResult, HttpServletRequest request) {
-        if(dni == null || dni.equals("") || !StringUtils.isNumeric(dni) || Long.parseLong(dni) < 1000000 || Long.parseLong(dni) > 999999999) {
-            ErrorDetails errorDetails = new ErrorDetails("Error en el ingreso de datos.", "DNI invalido. Debe ser un numero entre 1.000.000 y 999.999.999 no vacio ni nulo.");
+    public ResponseEntity<GlobalResponse> editarUsuario(@RequestParam String userName, @Valid @RequestBody Usuario usuario, BindingResult bindingResult, HttpServletRequest request) {
+        if (userName == null || userName.equals("")) {
+            ErrorDetails errorDetails = new ErrorDetails("Error en el ingreso de datos.", "El nombre usuario no puede ser nulo ni vacio.");
             return new ResponseEntity<>(GlobalResponse.globalResponse(HttpStatus.BAD_REQUEST, request.getRequestURI(),
                     null, errorDetails), HttpStatus.BAD_REQUEST);
         }
-        if(bindingResult.hasErrors()) {
+        if (bindingResult.hasErrors()) {
             List<String> errors = new ArrayList<>();
             bindingResult.getAllErrors().forEach(error -> {
                 errors.add(error.getDefaultMessage());
             });
-            ErrorDetails errorDetails = new ErrorDetails("Error en el ingreso de datos.", String.join(", ", errors));
+            ErrorDetails errorDetails = new ErrorDetails("Error en el ingreso de datos.", String.join(". ", errors));
             return new ResponseEntity<>(GlobalResponse.globalResponse(HttpStatus.BAD_REQUEST, request.getRequestURI(),
                     null, errorDetails), HttpStatus.BAD_REQUEST);
         }
-        return usuarioService.editarUsuario(dni, usuario, request);
+        return usuarioService.editarUsuario(userName, usuario, request);
     }
 }

@@ -30,8 +30,8 @@ public class AuthJwt {
     @Value("${configs.auth.issuer:none}")
     private String ISSUER;
 
-    public String generateToken(Object obj) {
-        String subject = GsonUtil.serialize(obj);
+    public String generateToken(AuthUserLoggedIn user) {
+        String subject = GsonUtil.serialize(user);
         TimeZone tz = TimeZone.getTimeZone(TIMEZONE);
         ZonedDateTime now = ZonedDateTime.now(tz.toZoneId());
         ZonedDateTime exp = now.plusSeconds(EXPIRATION_TIME);
@@ -50,15 +50,15 @@ public class AuthJwt {
             Jwts.parser().setSigningKey(SECRET).parseClaimsJws(token);
             return true;
         } catch (MalformedJwtException e) {
-            logger.error("token mal formado");
+            logger.error("Token mal formado.");
         } catch (UnsupportedJwtException e) {
-            logger.error("token no soportado");
+            logger.error("Token no soportado.");
         } catch (ExpiredJwtException e) {
-            logger.error("token expirado");
+            logger.error("Token expirado.");
         } catch (IllegalArgumentException e) {
-            logger.error("token vacío");
+            logger.error("Token vacío.");
         } catch (SignatureException e) {
-            logger.error("fail en la firma");
+            logger.error("Error en la firma.");
         }
         return false;
     }

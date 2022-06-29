@@ -8,7 +8,6 @@ import app.feature.repositories.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.Objects;
 import java.util.Optional;
 
 @Component
@@ -17,21 +16,10 @@ public class AuthValidator {
     @Autowired
     private UsuarioRepository usuarioRepository;
 
-    private static final String CLIENT_CREDENTIALS = "client_credentials";
-
-    public AuthUserLoggedIn validate(AuthRequest authRequest, String grantType) throws AuthException {
-
-        if (grantType.isEmpty() || !grantType.equals(CLIENT_CREDENTIALS)) {
-            message("Invalid grant_type");
-        }
-
-        if (Objects.isNull(authRequest) || authRequest.getUserName().equals("") || authRequest.getPassword().equals("")) {
-            message("Invalid user or password");
-        }
-
+    public AuthUserLoggedIn validarBuscarUsuario(AuthRequest authRequest) throws AuthException {
         Optional<Usuario> userOpt = usuarioRepository.findByUserNameAndPassword(authRequest.getUserName(), authRequest.getPassword());
         if (!userOpt.isPresent()) {
-            message("Invalid user or password");
+            message("Usuario o contraseña incorrecta");
         }
 
         Usuario user = userOpt.get();

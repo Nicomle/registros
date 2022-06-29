@@ -27,7 +27,7 @@ public class EmpresaController {
     @GetMapping("/obtener")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<GlobalResponse> obtenerEmpresa(@RequestParam String cuit, HttpServletRequest request) {
-        if(cuit == null || cuit.equals("") || !StringUtils.isNumeric(cuit)) {
+        if (cuit == null || cuit.equals("") || !StringUtils.isNumeric(cuit)) {
             ErrorDetails errorDetails = new ErrorDetails("Error en el ingreso de datos.", "Cuit invalido. Debe ser un numero no vacio ni nulo.");
             return new ResponseEntity<>(GlobalResponse.globalResponse(HttpStatus.BAD_REQUEST, request.getRequestURI(),
                     null, errorDetails), HttpStatus.BAD_REQUEST);
@@ -44,12 +44,12 @@ public class EmpresaController {
     @PostMapping("/guardar")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<GlobalResponse> guardarEmpresa(@Valid @RequestBody Empresa empresa, BindingResult bindingResult, HttpServletRequest request) {
-        if(bindingResult.hasErrors()) {
+        if (bindingResult.hasErrors()) {
             List<String> errors = new ArrayList<>();
             bindingResult.getAllErrors().forEach(error -> {
                 errors.add(error.getDefaultMessage());
             });
-            ErrorDetails errorDetails = new ErrorDetails("Error en el ingreso de datos.", String.join(", ", errors));
+            ErrorDetails errorDetails = new ErrorDetails("Error en el ingreso de datos.", String.join(". ", errors));
             return new ResponseEntity<>(GlobalResponse.globalResponse(HttpStatus.BAD_REQUEST, request.getRequestURI(),
                     null, errorDetails), HttpStatus.BAD_REQUEST);
         }
@@ -59,7 +59,7 @@ public class EmpresaController {
     @DeleteMapping("/eliminar")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<GlobalResponse> eliminarEmpresa(@RequestParam String cuit, HttpServletRequest request) {
-        if(cuit == null || cuit.equals("") || !StringUtils.isNumeric(cuit)) {
+        if (cuit == null || cuit.equals("") || !StringUtils.isNumeric(cuit)) {
             ErrorDetails errorDetails = new ErrorDetails("Error en el ingreso de datos.", "Cuit invalido. Debe ser un numero no vacio ni nulo.");
             return new ResponseEntity<>(GlobalResponse.globalResponse(HttpStatus.BAD_REQUEST, request.getRequestURI(),
                     null, errorDetails), HttpStatus.BAD_REQUEST);
@@ -75,12 +75,12 @@ public class EmpresaController {
             return new ResponseEntity<>(GlobalResponse.globalResponse(HttpStatus.BAD_REQUEST, request.getRequestURI(),
                     null, errorDetails), HttpStatus.BAD_REQUEST);
         }
-        if(bindingResult.hasErrors()) {
+        if (bindingResult.hasErrors()) {
             List<String> errors = new ArrayList<>();
             bindingResult.getAllErrors().forEach(error -> {
                 errors.add(error.getDefaultMessage());
             });
-            ErrorDetails errorDetails = new ErrorDetails("Error en el ingreso de datos.", String.join(", ", errors));
+            ErrorDetails errorDetails = new ErrorDetails("Error en el ingreso de datos.", String.join(". ", errors));
             return new ResponseEntity<>(GlobalResponse.globalResponse(HttpStatus.BAD_REQUEST, request.getRequestURI(),
                     null, errorDetails), HttpStatus.BAD_REQUEST);
         }

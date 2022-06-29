@@ -29,12 +29,12 @@ public class RegistroService {
     public ResponseEntity<GlobalResponse> obtenerRegistro(Long id, HttpServletRequest request) {
         try {
             Optional<Registro> registroBase = registroRepository.findById(id);
-            if(!registroBase.isPresent()) {
+            if (!registroBase.isPresent()) {
                 return new ResponseEntity<>(null, HttpStatus.NO_CONTENT);
             }
             return new ResponseEntity<>(GlobalResponse.globalResponse(HttpStatus.OK, request.getRequestURI(),
                     registroBase.get(), null), HttpStatus.OK);
-        } catch(Exception e) {
+        } catch (Exception e) {
             ErrorDetails errorDetails = new ErrorDetails("Error al intentar obtener registro en la base de datos.", e.getMessage());
             return new ResponseEntity<>(GlobalResponse.globalResponse(HttpStatus.INTERNAL_SERVER_ERROR, request.getRequestURI(),
                     null, errorDetails), HttpStatus.INTERNAL_SERVER_ERROR);
@@ -53,25 +53,25 @@ public class RegistroService {
     }
 
     public ResponseEntity<GlobalResponse> guardarRegistro(Registro registro, HttpServletRequest request) {
-        if(registro.getUser().getId() == null || registro.getUser().getId() <= 0) {
+        if (registro.getUser().getId() == null || registro.getUser().getId() <= 0) {
             ErrorDetails errorDetails = new ErrorDetails("El ID del usuario ingresado es invalida.", "ID Empresa: " + registro.getUser().getId());
             return new ResponseEntity<>(GlobalResponse.globalResponse(HttpStatus.BAD_REQUEST, request.getRequestURI(),
                     null, errorDetails), HttpStatus.BAD_REQUEST);
         }
-        if(registro.getProject().getId() == null || registro.getProject().getId() <= 0) {
+        if (registro.getProject().getId() == null || registro.getProject().getId() <= 0) {
             ErrorDetails errorDetails = new ErrorDetails("El ID del proyecto ingresado es invalida.", "ID Empresa: " + registro.getUser().getId());
             return new ResponseEntity<>(GlobalResponse.globalResponse(HttpStatus.BAD_REQUEST, request.getRequestURI(),
                     null, errorDetails), HttpStatus.BAD_REQUEST);
         }
         try {
             Usuario usuario = usuarioService.obtenerUsuarioId(registro.getUser().getId());
-            if(usuario == null) {
+            if (usuario == null) {
                 ErrorDetails errorDetails = new ErrorDetails("El ID del usuario ingresado no existe.", "ID Empresa: " + registro.getUser().getId());
                 return new ResponseEntity<>(GlobalResponse.globalResponse(HttpStatus.BAD_REQUEST, request.getRequestURI(),
                         null, errorDetails), HttpStatus.BAD_REQUEST);
             }
             Proyecto proyecto = proyectoService.obtenerProyectoId(registro.getProject().getId());
-            if(proyecto == null) {
+            if (proyecto == null) {
                 ErrorDetails errorDetails = new ErrorDetails("El ID del proyecto ingresado no existe.", "ID Empresa: " + registro.getUser().getId());
                 return new ResponseEntity<>(GlobalResponse.globalResponse(HttpStatus.BAD_REQUEST, request.getRequestURI(),
                         null, errorDetails), HttpStatus.BAD_REQUEST);
@@ -104,12 +104,12 @@ public class RegistroService {
     }
 
     public ResponseEntity<GlobalResponse> editarRegistro(Long id, Registro registro, HttpServletRequest request) {
-        if(registro.getUser().getId() == null || registro.getUser().getId() <= 0) {
+        if (registro.getUser().getId() == null || registro.getUser().getId() <= 0) {
             ErrorDetails errorDetails = new ErrorDetails("El ID del usuario ingresado es invalida.", "ID Empresa: " + registro.getUser().getId());
             return new ResponseEntity<>(GlobalResponse.globalResponse(HttpStatus.BAD_REQUEST, request.getRequestURI(),
                     null, errorDetails), HttpStatus.BAD_REQUEST);
         }
-        if(registro.getProject().getId() == null || registro.getProject().getId() <= 0) {
+        if (registro.getProject().getId() == null || registro.getProject().getId() <= 0) {
             ErrorDetails errorDetails = new ErrorDetails("El ID del proyecto ingresado es invalida.", "ID Empresa: " + registro.getUser().getId());
             return new ResponseEntity<>(GlobalResponse.globalResponse(HttpStatus.BAD_REQUEST, request.getRequestURI(),
                     null, errorDetails), HttpStatus.BAD_REQUEST);
@@ -120,13 +120,13 @@ public class RegistroService {
                 return new ResponseEntity<>(null, HttpStatus.NO_CONTENT);
             }
             Usuario usuario = usuarioService.obtenerUsuarioId(registro.getUser().getId());
-            if(usuario == null) {
+            if (usuario == null) {
                 ErrorDetails errorDetails = new ErrorDetails("El ID del usuario ingresado no existe.", "ID Empresa: " + registro.getUser().getId());
                 return new ResponseEntity<>(GlobalResponse.globalResponse(HttpStatus.BAD_REQUEST, request.getRequestURI(),
                         null, errorDetails), HttpStatus.BAD_REQUEST);
             }
             Proyecto proyecto = proyectoService.obtenerProyectoId(registro.getProject().getId());
-            if(proyecto == null) {
+            if (proyecto == null) {
                 ErrorDetails errorDetails = new ErrorDetails("El ID del proyecto ingresado no existe.", "ID Empresa: " + registro.getUser().getId());
                 return new ResponseEntity<>(GlobalResponse.globalResponse(HttpStatus.BAD_REQUEST, request.getRequestURI(),
                         null, errorDetails), HttpStatus.BAD_REQUEST);
