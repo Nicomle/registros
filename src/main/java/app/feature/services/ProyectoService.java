@@ -109,7 +109,22 @@ public class ProyectoService {
                 proyectoBase.get().setCompany(empresa);
             }
             proyectoBase.get().setName(proyecto.getName());
-            proyectoBase.get().setStatus(proyecto.isStatus());
+            return new ResponseEntity<>(GlobalResponse.globalResponse(HttpStatus.OK, request.getRequestURI(),
+                    proyectoRepository.save(proyectoBase.get()), null), HttpStatus.OK);
+        } catch (Exception e) {
+            ErrorDetails errorDetails = new ErrorDetails("Error al intentar editar registro en la base de datos.", e.getMessage());
+            return new ResponseEntity<>(GlobalResponse.globalResponse(HttpStatus.INTERNAL_SERVER_ERROR, request.getRequestURI(),
+                    null, errorDetails), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public ResponseEntity<GlobalResponse> cambiarStatus(Long id, HttpServletRequest request) {
+        try {
+            Optional<Proyecto> proyectoBase = proyectoRepository.findById(id);
+            if (!proyectoBase.isPresent()) {
+                return new ResponseEntity<>(null, HttpStatus.NO_CONTENT);
+            }
+            proyectoBase.get().setStatus(!proyectoBase.get().isStatus());
             return new ResponseEntity<>(GlobalResponse.globalResponse(HttpStatus.OK, request.getRequestURI(),
                     proyectoRepository.save(proyectoBase.get()), null), HttpStatus.OK);
         } catch (Exception e) {

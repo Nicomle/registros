@@ -2,11 +2,9 @@ package app.feature.controllers;
 
 import app.feature.entities.Proyecto;
 import app.feature.services.ProyectoService;
-import app.core.exceptions.ErrorDetails;
 import app.core.response.GlobalResponse;
-import org.apache.commons.lang3.StringUtils;
+import app.feature.services.Validacion;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
@@ -14,8 +12,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
-import java.util.ArrayList;
-import java.util.List;
 
 @RestController
 @RequestMapping("/proyectos")
@@ -24,13 +20,15 @@ public class ProyectoController {
     @Autowired
     ProyectoService proyectoService;
 
+    @Autowired
+    private Validacion validacion;
+
     @GetMapping("/obtener")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<GlobalResponse> obtenerProyecto(@RequestParam String id, HttpServletRequest request) {
-        if (id == null || id.equals("") || !StringUtils.isNumeric(id)) {
-            ErrorDetails errorDetails = new ErrorDetails("Error en el ingreso de datos.", "ID invalido. Debe ser un numero no vacio ni nulo.");
-            return new ResponseEntity<>(GlobalResponse.globalResponse(HttpStatus.BAD_REQUEST, request.getRequestURI(),
-                    null, errorDetails), HttpStatus.BAD_REQUEST);
+        ResponseEntity<GlobalResponse> response = validacion.validarId(id, request);
+        if (response != null) {
+            return response;
         }
         return proyectoService.obtenerProyecto(Long.parseLong(id), request);
     }
@@ -44,14 +42,9 @@ public class ProyectoController {
     @PostMapping("/guardar")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<GlobalResponse> guardarProyecto(@Valid @RequestBody Proyecto proyecto, BindingResult bindingResult, HttpServletRequest request) {
-        if (bindingResult.hasErrors()) {
-            List<String> errors = new ArrayList<>();
-            bindingResult.getAllErrors().forEach(error -> {
-                errors.add(error.getDefaultMessage());
-            });
-            ErrorDetails errorDetails = new ErrorDetails("Error en el ingreso de datos.", String.join(". ", errors));
-            return new ResponseEntity<>(GlobalResponse.globalResponse(HttpStatus.BAD_REQUEST, request.getRequestURI(),
-                    null, errorDetails), HttpStatus.BAD_REQUEST);
+        ResponseEntity<GlobalResponse> response = validacion.validarBindingResult(bindingResult, request);
+        if (response != null) {
+            return response;
         }
         return proyectoService.guardarProyecto(proyecto, request);
     }
@@ -59,10 +52,9 @@ public class ProyectoController {
     @DeleteMapping("/eliminar")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<GlobalResponse> eliminarProyecto(@RequestParam String id, HttpServletRequest request) {
-        if (id == null || id.equals("") || !StringUtils.isNumeric(id)) {
-            ErrorDetails errorDetails = new ErrorDetails("Error en el ingreso de datos.", "ID invalido. Debe ser un numero no vacio ni nulo.");
-            return new ResponseEntity<>(GlobalResponse.globalResponse(HttpStatus.BAD_REQUEST, request.getRequestURI(),
-                    null, errorDetails), HttpStatus.BAD_REQUEST);
+        ResponseEntity<GlobalResponse> response = validacion.validarId(id, request);
+        if (response != null) {
+            return response;
         }
         return proyectoService.eliminarProyecto(Long.parseLong(id), request);
     }
@@ -70,20 +62,24 @@ public class ProyectoController {
     @PutMapping("/editar")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<GlobalResponse> editarProyecto(@RequestParam String id, @Valid @RequestBody Proyecto proyecto, BindingResult bindingResult, HttpServletRequest request) {
-        if (id == null || id.equals("") || !StringUtils.isNumeric(id)) {
-            ErrorDetails errorDetails = new ErrorDetails("Error en el ingreso de datos.", "ID invalido. Debe ser un numero no vacio ni nulo.");
-            return new ResponseEntity<>(GlobalResponse.globalResponse(HttpStatus.BAD_REQUEST, request.getRequestURI(),
-                    null, errorDetails), HttpStatus.BAD_REQUEST);
+        ResponseEntity<GlobalResponse> response = validacion.validarId(id, request);
+        if (response != null) {
+            return response;
         }
-        if (bindingResult.hasErrors()) {
-            List<String> errors = new ArrayList<>();
-            bindingResult.getAllErrors().forEach(error -> {
-                errors.add(error.getDefaultMessage());
-            });
-            ErrorDetails errorDetails = new ErrorDetails("Error en el ingreso de datos.", String.join(". ", errors));
-            return new ResponseEntity<>(GlobalResponse.globalResponse(HttpStatus.BAD_REQUEST, request.getRequestURI(),
-                    null, errorDetails), HttpStatus.BAD_REQUEST);
+        response = validacion.validarBindingResult(bindingResult, request);
+        if (response != null) {
+            return response;
         }
         return proyectoService.editarProyecto(Long.parseLong(id), proyecto, request);
+    }
+
+    @PostMapping("/cambiar/status")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<GlobalResponse> cambiarStatus(@RequestParam String id, HttpServletRequest request) {
+        ResponseEntity<GlobalResponse> response = validacion.validarId(id, request);
+        if (response != null) {
+            return response;
+        }
+        return proyectoService.cambiarStatus(Long.parseLong(id), request);
     }
 }

@@ -29,5 +29,5 @@ public class Proyecto {
     @NotBlank(message = "La descripcion no puede ser nulo o vacio")
     private String name;
 
-    private boolean status = true;
+    private boolean status;
 }

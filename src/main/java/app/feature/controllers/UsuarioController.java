@@ -2,10 +2,9 @@ package app.feature.controllers;
 
 import app.feature.entities.Usuario;
 import app.feature.services.UsuarioService;
-import app.core.exceptions.ErrorDetails;
 import app.core.response.GlobalResponse;
+import app.feature.services.Validacion;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
@@ -13,8 +12,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
-import java.util.ArrayList;
-import java.util.List;
 
 @RestController
 @RequestMapping("/usuarios")
@@ -23,13 +20,15 @@ public class UsuarioController {
     @Autowired
     UsuarioService usuarioService;
 
+    @Autowired
+    private Validacion validacion;
+
     @GetMapping("/obtener")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<GlobalResponse> obtenerUsuario(@RequestParam String userName, HttpServletRequest request) {
-        if (userName == null || userName.equals("")) {
-            ErrorDetails errorDetails = new ErrorDetails("Error en el ingreso de datos.", "El nombre usuario no puede ser vacio ni nulo.");
-            return new ResponseEntity<>(GlobalResponse.globalResponse(HttpStatus.BAD_REQUEST, request.getRequestURI(),
-                    null, errorDetails), HttpStatus.BAD_REQUEST);
+        ResponseEntity<GlobalResponse> response = validacion.validarString(userName, "Nombre usuario", request);
+        if (response != null) {
+            return response;
         }
         return usuarioService.obtenerUsuario(userName, request);
     }
@@ -42,14 +41,9 @@ public class UsuarioController {
 
     @PostMapping("/guardar")
     public ResponseEntity<GlobalResponse> guardarUsuario(@Valid @RequestBody Usuario usuario, BindingResult bindingResult, HttpServletRequest request) {
-        if (bindingResult.hasErrors()) {
-            List<String> errors = new ArrayList<>();
-            bindingResult.getAllErrors().forEach(error -> {
-                errors.add(error.getDefaultMessage());
-            });
-            ErrorDetails errorDetails = new ErrorDetails("Error en el ingreso de datos.", String.join(". ", errors));
-            return new ResponseEntity<>(GlobalResponse.globalResponse(HttpStatus.BAD_REQUEST, request.getRequestURI(),
-                    null, errorDetails), HttpStatus.BAD_REQUEST);
+        ResponseEntity<GlobalResponse> response = validacion.validarBindingResult(bindingResult, request);
+        if (response != null) {
+            return response;
         }
         return usuarioService.guardarUsuario(usuario, request);
     }
@@ -57,10 +51,9 @@ public class UsuarioController {
     @DeleteMapping("/eliminar")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<GlobalResponse> eliminarUsuario(@RequestParam String userName, HttpServletRequest request) {
-        if (userName == null || userName.equals("")) {
-            ErrorDetails errorDetails = new ErrorDetails("Error en el ingreso de datos.", "El nombre usuario no puede ser nulo ni vacio.");
-            return new ResponseEntity<>(GlobalResponse.globalResponse(HttpStatus.BAD_REQUEST, request.getRequestURI(),
-                    null, errorDetails), HttpStatus.BAD_REQUEST);
+        ResponseEntity<GlobalResponse> response = validacion.validarString(userName, "Nombre usuario", request);
+        if (response != null) {
+            return response;
         }
         return usuarioService.eliminarUsuario(userName, request);
     }
@@ -68,20 +61,52 @@ public class UsuarioController {
     @PutMapping("/editar")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<GlobalResponse> editarUsuario(@RequestParam String userName, @Valid @RequestBody Usuario usuario, BindingResult bindingResult, HttpServletRequest request) {
-        if (userName == null || userName.equals("")) {
-            ErrorDetails errorDetails = new ErrorDetails("Error en el ingreso de datos.", "El nombre usuario no puede ser nulo ni vacio.");
-            return new ResponseEntity<>(GlobalResponse.globalResponse(HttpStatus.BAD_REQUEST, request.getRequestURI(),
-                    null, errorDetails), HttpStatus.BAD_REQUEST);
+        ResponseEntity<GlobalResponse> response = validacion.validarString(userName, "Nombre usuario", request);
+        if (response != null) {
+            return response;
         }
-        if (bindingResult.hasErrors()) {
-            List<String> errors = new ArrayList<>();
-            bindingResult.getAllErrors().forEach(error -> {
-                errors.add(error.getDefaultMessage());
-            });
-            ErrorDetails errorDetails = new ErrorDetails("Error en el ingreso de datos.", String.join(". ", errors));
-            return new ResponseEntity<>(GlobalResponse.globalResponse(HttpStatus.BAD_REQUEST, request.getRequestURI(),
-                    null, errorDetails), HttpStatus.BAD_REQUEST);
+        response = validacion.validarBindingResult(bindingResult, request);
+        if (response != null) {
+            return response;
         }
         return usuarioService.editarUsuario(userName, usuario, request);
+    }
+
+    @PostMapping("/cambiar/status")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<GlobalResponse> cambiarStatus(@RequestParam String id, HttpServletRequest request) {
+        ResponseEntity<GlobalResponse> response = validacion.validarId(id, request);
+        if (response != null) {
+            return response;
+        }
+        return usuarioService.cambiarStatus(Long.parseLong(id), request);
+    }
+
+    @PutMapping("/cambiar/rol/agregar")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<GlobalResponse> agregarRol(@RequestParam String idUsuario, @RequestParam String idRol, HttpServletRequest request) {
+        ResponseEntity<GlobalResponse> response = validacion.validarId(idUsuario, request);
+        if (response != null) {
+            return response;
+        }
+        response = validacion.validarId(idRol, request);
+        if (response != null) {
+            return response;
+        }
+        return usuarioService.agregarRol(Long.parseLong(idUsuario), Long.parseLong(idRol), request);
+    }
+
+    @PutMapping("/cambiar/rol/eliminar")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<GlobalResponse> eliminarRol(@RequestParam String idUsuario, @RequestParam String idRol, HttpServletRequest request) {
+        ResponseEntity<GlobalResponse> response = validacion.validarId(idUsuario, request);
+        if (response != null) {
+            return response;
+        }
+        response = validacion.validarId(idRol, request);
+        if (response != null) {
+            return response;
+        }
+        return usuarioService.eliminarRol(Long.parseLong(idUsuario), Long.parseLong(idRol), request);
     }
 }

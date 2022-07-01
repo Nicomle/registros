@@ -25,4 +25,6 @@ public class Empresa {
 
     @NotBlank(message = "El nombre no puede ser nulo o vacio")
     private String name;
+
+    private boolean status;
 }

@@ -52,6 +52,7 @@ public class EmpresaService {
                 return new ResponseEntity<>(GlobalResponse.globalResponse(HttpStatus.BAD_REQUEST, request.getRequestURI(),
                         empresa, errorDetails), HttpStatus.BAD_REQUEST);
             }
+            empresaBase.get().setStatus(true);
             return new ResponseEntity<>(GlobalResponse.globalResponse(HttpStatus.OK, request.getRequestURI(),
                     empresaRepository.save(empresa), null), HttpStatus.OK);
         } catch (Exception e) {
@@ -87,6 +88,22 @@ public class EmpresaService {
             empresaBase.get().setName(empresa.getName());
             return new ResponseEntity<>(GlobalResponse.globalResponse(HttpStatus.OK, request.getRequestURI(),
                     empresaRepository.save(empresaBase.get()), null), HttpStatus.OK);
+        } catch (Exception e) {
+            ErrorDetails errorDetails = new ErrorDetails("Error al intentar editar registro en la base de datos.", e.getMessage());
+            return new ResponseEntity<>(GlobalResponse.globalResponse(HttpStatus.INTERNAL_SERVER_ERROR, request.getRequestURI(),
+                    null, errorDetails), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public ResponseEntity<GlobalResponse> cambiarStatus(Long id, HttpServletRequest request) {
+        try {
+            Optional<Empresa> proyectoBase = empresaRepository.findById(id);
+            if (!proyectoBase.isPresent()) {
+                return new ResponseEntity<>(null, HttpStatus.NO_CONTENT);
+            }
+            proyectoBase.get().setStatus(!proyectoBase.get().isStatus());
+            return new ResponseEntity<>(GlobalResponse.globalResponse(HttpStatus.OK, request.getRequestURI(),
+                    empresaRepository.save(proyectoBase.get()), null), HttpStatus.OK);
         } catch (Exception e) {
             ErrorDetails errorDetails = new ErrorDetails("Error al intentar editar registro en la base de datos.", e.getMessage());
             return new ResponseEntity<>(GlobalResponse.globalResponse(HttpStatus.INTERNAL_SERVER_ERROR, request.getRequestURI(),

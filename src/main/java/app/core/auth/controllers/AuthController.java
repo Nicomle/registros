@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
@@ -59,5 +60,11 @@ public class AuthController {
             return new ResponseEntity<>(GlobalResponse.globalResponse(HttpStatus.BAD_REQUEST, request.getRequestURI(),
                     null, errorDetails), HttpStatus.BAD_REQUEST);
         }
+    }
+
+    @GetMapping("/roles/obtener/lista")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<GlobalResponse> obtenerRoles(HttpServletRequest request) {
+        return authService.obtenerListaRoles(request);
     }
 }
