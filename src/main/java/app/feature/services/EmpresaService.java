@@ -52,7 +52,7 @@ public class EmpresaService {
                 return new ResponseEntity<>(GlobalResponse.globalResponse(HttpStatus.BAD_REQUEST, request.getRequestURI(),
                         empresa, errorDetails), HttpStatus.BAD_REQUEST);
             }
-            empresaBase.get().setStatus(true);
+            empresa.setStatus(true);
             return new ResponseEntity<>(GlobalResponse.globalResponse(HttpStatus.OK, request.getRequestURI(),
                     empresaRepository.save(empresa), null), HttpStatus.OK);
         } catch (Exception e) {

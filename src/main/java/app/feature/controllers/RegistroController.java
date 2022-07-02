@@ -18,7 +18,7 @@ import javax.validation.Valid;
 public class RegistroController {
 
     @Autowired
-    RegistroService registroService;
+    private RegistroService registroService;
 
     @Autowired
     private Validacion validacion;
@@ -27,6 +27,10 @@ public class RegistroController {
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<GlobalResponse> obtenerRegistro(@RequestParam String id, HttpServletRequest request) {
         ResponseEntity<GlobalResponse> response = validacion.validarId(id, request);
+        if (response != null) {
+            return response;
+        }
+        response = validacion.validarUsuarioToken("id", id, request);
         if (response != null) {
             return response;
         }
@@ -39,10 +43,28 @@ public class RegistroController {
         return registroService.obtenerListaRegistros(request);
     }
 
+    @GetMapping("/obtener/lista/usuario")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<GlobalResponse> obtenerListaRegistrosUsuario(@RequestParam String userName, HttpServletRequest request) {
+        ResponseEntity<GlobalResponse> response = validacion.validarString(userName, "Nombre usuario", request);
+        if (response != null) {
+            return response;
+        }
+        response = validacion.validarUsuarioToken("userName", userName, request);
+        if (response != null) {
+            return response;
+        }
+        return registroService.obtenerListaRegistrosUsuario(userName, request);
+    }
+
     @PostMapping("/guardar")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<GlobalResponse> guardarRegistro(@Valid @RequestBody Registro registro, BindingResult bindingResult, HttpServletRequest request) {
         ResponseEntity<GlobalResponse> response = validacion.validarBindingResult(bindingResult, request);
+        if (response != null) {
+            return response;
+        }
+        response = validacion.validarUsuarioToken("userName", registro.getUser().getUserName(), request);
         if (response != null) {
             return response;
         }
@@ -53,6 +75,10 @@ public class RegistroController {
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<GlobalResponse> eliminarRegistro(@RequestParam String id, HttpServletRequest request) {
         ResponseEntity<GlobalResponse> response = validacion.validarId(id, request);
+        if (response != null) {
+            return response;
+        }
+        response = validacion.validarUsuarioToken("id", id, request);
         if (response != null) {
             return response;
         }
@@ -67,6 +93,10 @@ public class RegistroController {
             return response;
         }
         response = validacion.validarBindingResult(bindingResult, request);
+        if (response != null) {
+            return response;
+        }
+        response = validacion.validarUsuarioToken("id", id, request);
         if (response != null) {
             return response;
         }

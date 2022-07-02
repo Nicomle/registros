@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -46,7 +47,28 @@ public class RegistroService {
             return new ResponseEntity<>(GlobalResponse.globalResponse(HttpStatus.OK, request.getRequestURI(),
                     registroRepository.findAll(), null), HttpStatus.OK);
         } catch (Exception e) {
-            ErrorDetails errorDetails = new ErrorDetails("Error al intentar obtener lista de registros en la base de datos.", e.getMessage());
+            ErrorDetails errorDetails = new ErrorDetails("Error al intentar obtener lista de registros en la base de datos", e.getMessage());
+            return new ResponseEntity<>(GlobalResponse.globalResponse(HttpStatus.INTERNAL_SERVER_ERROR, request.getRequestURI(),
+                    null, errorDetails), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public ResponseEntity<GlobalResponse> obtenerListaRegistrosUsuario(String userName, HttpServletRequest request) {
+        try {
+            Usuario usuarioBase = usuarioService.obtenerUsuarioUserName(userName);
+            if (usuarioBase == null) {
+                ErrorDetails errorDetails = new ErrorDetails("Error al intentar obtener lista de registros en la base de datos", "El usuario con el nombre usuario: " + userName + " no existe");
+                return new ResponseEntity<>(GlobalResponse.globalResponse(HttpStatus.BAD_REQUEST, request.getRequestURI(),
+                        null, errorDetails), HttpStatus.BAD_REQUEST);
+            }
+            List<Registro> listRegistros = registroRepository.obtenerRegistrosUsuario(usuarioBase.getId());
+            if (listRegistros.size() == 0) {
+                return new ResponseEntity<>(null, HttpStatus.NO_CONTENT);
+            }
+            return new ResponseEntity<>(GlobalResponse.globalResponse(HttpStatus.OK, request.getRequestURI(),
+                    listRegistros, null), HttpStatus.OK);
+        } catch (Exception e) {
+            ErrorDetails errorDetails = new ErrorDetails("Error al intentar obtener lista de registros en la base de datos", e.getMessage());
             return new ResponseEntity<>(GlobalResponse.globalResponse(HttpStatus.INTERNAL_SERVER_ERROR, request.getRequestURI(),
                     null, errorDetails), HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -93,9 +115,12 @@ public class RegistroService {
             if (!registroBase.isPresent()) {
                 return new ResponseEntity<>(null, HttpStatus.NO_CONTENT);
             }
+            Registro registroCopia = registroBase.get();
+            registroBase.get().setProject(null);
+            registroBase.get().setUser(null);
             registroRepository.delete(registroBase.get());
             return new ResponseEntity<>(GlobalResponse.globalResponse(HttpStatus.OK, request.getRequestURI(),
-                    registroBase, null), HttpStatus.OK);
+                    registroCopia, null), HttpStatus.OK);
         } catch (Exception e) {
             ErrorDetails errorDetails = new ErrorDetails("Error al intentar eliminar registro en la base de datos.", e.getMessage());
             return new ResponseEntity<>(GlobalResponse.globalResponse(HttpStatus.INTERNAL_SERVER_ERROR, request.getRequestURI(),

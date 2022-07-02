@@ -13,6 +13,7 @@ import java.util.Set;
 @Builder
 public class AuthUserLoggedIn {
 
+    private Long id;
     private String userName;
     private String name;
     private String surName;

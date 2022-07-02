@@ -89,10 +89,11 @@ public class UsuarioService {
             if (!usuarioBase.isPresent()) {
                 return new ResponseEntity<>(null, HttpStatus.NO_CONTENT);
             }
+            Usuario usuarioCopia = usuarioBase.get();
             usuarioBase.get().setRoles(null);
             usuarioRepository.delete(usuarioBase.get());
             return new ResponseEntity<>(GlobalResponse.globalResponse(HttpStatus.OK, request.getRequestURI(),
-                    usuarioBase, null), HttpStatus.OK);
+                    usuarioCopia, null), HttpStatus.OK);
         } catch (Exception e) {
             ErrorDetails errorDetails = new ErrorDetails("Error al intentar eliminar registro en la base de datos.", e.getMessage());
             return new ResponseEntity<>(GlobalResponse.globalResponse(HttpStatus.INTERNAL_SERVER_ERROR, request.getRequestURI(),
@@ -214,6 +215,15 @@ public class UsuarioService {
 
     public Usuario obtenerUsuarioId(Long id) {
         Optional<Usuario> usuario = usuarioRepository.findById(id);
+        if (usuario.isPresent()) {
+            return usuario.get();
+        } else {
+            return null;
+        }
+    }
+
+    public Usuario obtenerUsuarioUserName(String userName) {
+        Optional<Usuario> usuario = usuarioRepository.findByUserName(userName);
         if (usuario.isPresent()) {
             return usuario.get();
         } else {

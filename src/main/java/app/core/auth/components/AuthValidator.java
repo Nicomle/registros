@@ -24,6 +24,7 @@ public class AuthValidator {
 
         Usuario user = userOpt.get();
         return AuthUserLoggedIn.builder()
+                .id(user.getId())
                 .userName(user.getUserName())
                 .name(user.getName())
                 .surName(user.getSurname())

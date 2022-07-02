@@ -50,22 +50,21 @@ public class AuthJwt {
             Jwts.parser().setSigningKey(SECRET).parseClaimsJws(token);
             return true;
         } catch (MalformedJwtException e) {
-            logger.error("Token mal formado.");
+            logger.error("Token mal formado");
         } catch (UnsupportedJwtException e) {
-            logger.error("Token no soportado.");
+            logger.error("Token no soportado");
         } catch (ExpiredJwtException e) {
-            logger.error("Token expirado.");
+            logger.error("Token expirado");
         } catch (IllegalArgumentException e) {
-            logger.error("Token vacío.");
+            logger.error("Token vacío");
         } catch (SignatureException e) {
-            logger.error("Error en la firma.");
+            logger.error("Error en la firma");
         }
         return false;
     }
 
-    public String getNombreUsuarioFromToken(String token) {
+    public AuthUserLoggedIn getUsuarioFromToken(String token) {
         Gson gson = new Gson();
-        AuthUserLoggedIn usuario = gson.fromJson(Jwts.parser().setSigningKey(SECRET).parseClaimsJws(token).getBody().getSubject(), AuthUserLoggedIn.class);
-        return usuario.getUserName();
+        return gson.fromJson(Jwts.parser().setSigningKey(SECRET).parseClaimsJws(token).getBody().getSubject(), AuthUserLoggedIn.class);
     }
 }

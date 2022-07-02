@@ -18,7 +18,7 @@ import javax.validation.Valid;
 public class UsuarioController {
 
     @Autowired
-    UsuarioService usuarioService;
+    private UsuarioService usuarioService;
 
     @Autowired
     private Validacion validacion;
@@ -66,6 +66,10 @@ public class UsuarioController {
             return response;
         }
         response = validacion.validarBindingResult(bindingResult, request);
+        if (response != null) {
+            return response;
+        }
+        response = validacion.validarUsuarioToken("userName", userName, request);
         if (response != null) {
             return response;
         }

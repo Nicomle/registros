@@ -18,7 +18,7 @@ import javax.validation.Valid;
 public class ProyectoController {
 
     @Autowired
-    ProyectoService proyectoService;
+    private ProyectoService proyectoService;
 
     @Autowired
     private Validacion validacion;
